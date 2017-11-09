@@ -26,12 +26,12 @@ var GroupRoll = GroupRoll || (function() {
             case '!group-roll':
                 if(args.length > 0) {
                     var cmds = args.shift().split(/\s+/)
-                    var result = ''
+                    var chatOutput = ''
                     var count = 1
 
                     switch(cmds[0]) {
                         case 'perception':
-                            result += 'perception: '
+                            chatOutput += 'perception: '
                             _.chain(msg.selected)
                 				.map(function(o){return getObj('graphic',o._id)})
                 				.compact()
@@ -39,12 +39,12 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, 'perception'+'Mod')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, 'wisdom'+'Mod')
-                				    result += getD20Roll(cmds[1], modifier)
+                				    chatOutput += getD20Roll(cmds[1], modifier)
                             })
-                            sendChat('', '/w gm '+result)
+                            sendChat('', '/w gm '+chatOutput)
                             break
                         case 'stealth':
-                            result += 'stealth: '
+                            chatOutput += 'stealth: '
                             _.chain(msg.selected)
                 				.map(function(o){return getObj('graphic',o._id)})
                 				.compact()
@@ -52,12 +52,12 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, 'stealth'+'Mod')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, 'dexterity'+'Mod')
-                				    result += getD20Roll(cmds[1], modifier)
+                				    chatOutput += getD20Roll(cmds[1], modifier)
                             })
-                            sendChat('', '/w gm '+result)
+                            sendChat('', '/w gm '+chatOutput)
                             break
                         case 'save':
-                            result += cmds[1]+' saves: '
+                            chatOutput += cmds[1]+' saves: '
                             _.chain(msg.selected)
                 				.map(function(o){return getObj('graphic',o._id)})
                 				.compact()
@@ -66,26 +66,26 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, cmds[1]+'Save')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, cmds[1]+'Mod')
-                				    result += getD20Roll(cmds[2], modifier)
+                				    chatOutput += getD20Roll(cmds[2], modifier)
                             })
-                            sendChat('DM', result)
+                            sendChat('DM', chatOutput)
                             break
                         case 'roll':
 							if (cmds[1] == 'attack'){
-								result += 'Mass Attack'
+								chatOutput += 'Mass Attack'
 								_.chain(msg.selected)
 									.map(function(o){return getObj('graphic',o._id)})
 									.compact()
 									.each(function(obj){
 										obj.set('status_yellow', count++)
 										var characterID = obj.get('represents')
-										result += '\n' + getD20Roll(cmds[2], getAttrByName(characterID, 'attackHitMod'))
-										result += ' for [[' + getAttrByName(characterID, 'attackDamageRoll') + ']] '
-										result += getAttrByName(characterID, 'attackDamageType')
+										chatOutput += '\n' + getD20Roll(cmds[2], getAttrByName(characterID, 'attackHitMod'))
+										chatOutput += ' for [[' + getAttrByName(characterID, 'attackDamageRoll') + ']] '
+										chatOutput += getAttrByName(characterID, 'attackDamageType')
 								})
-								sendChat('DM', result)
+								sendChat('DM', chatOutput)
 							} else {
-								result += cmds[1]+' rolls: '
+								chatOutput += cmds[1]+' rolls: '
 								var modifierName = cmds[1]+'Mod'
 								_.chain(msg.selected)
 									.map(function(o){return getObj('graphic',o._id)})
@@ -94,9 +94,9 @@ var GroupRoll = GroupRoll || (function() {
 										obj.set('status_yellow', count++)
 										var characterID = obj.get('represents')
 										var modifier = getAttrByName(characterID, modifierName)
-										result += getD20Roll(cmds[2], modifier)
+										chatOutput += getD20Roll(cmds[2], modifier)
 								})
-								sendChat('DM', result)
+								sendChat('DM', chatOutput)
 							}
                             break
                         case 'clearmarkers':
