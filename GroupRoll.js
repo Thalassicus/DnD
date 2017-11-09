@@ -6,7 +6,7 @@ var GroupRoll = GroupRoll || (function() {
     var version = '1.0',
         lastUpdate = 1427604271,
 		
-	getRoll = function(rollType, modifier){
+	getD20Roll = function(rollType, modifier){
 		if (rollType == 'advantage'){
 			return '[[2d20kh1+' + modifier + ']]'
 		} else if (rollType == 'disadvantage') {
@@ -39,7 +39,7 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, 'perception'+'Mod')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, 'wisdom'+'Mod')
-                				    result += getRoll(cmds[1], modifier)
+                				    result += getD20Roll(cmds[1], modifier)
                             })
                             sendChat('', '/w gm '+result)
                             break
@@ -52,7 +52,7 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, 'stealth'+'Mod')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, 'dexterity'+'Mod')
-                				    result += getRoll(cmds[1], modifier)
+                				    result += getD20Roll(cmds[1], modifier)
                             })
                             sendChat('', '/w gm '+result)
                             break
@@ -66,23 +66,38 @@ var GroupRoll = GroupRoll || (function() {
                 				    var characterID = obj.get('represents')
                 				    var modifier = getAttrByName(characterID, cmds[1]+'Save')
                 				    if (modifier == 0) modifier = getAttrByName(characterID, cmds[1]+'Mod')
-                				    result += getRoll(cmds[2], modifier)
+                				    result += getD20Roll(cmds[2], modifier)
                             })
                             sendChat('DM', result)
                             break
                         case 'roll':
-                            result += cmds[1]+' rolls: '
-                            var modifierName = cmds[1]+'Mod'
-                            _.chain(msg.selected)
-                				.map(function(o){return getObj('graphic',o._id)})
-                				.compact()
-                				.each(function(obj){
-                				    obj.set('status_yellow', count++)
-                				    var characterID = obj.get('represents')
-                				    var modifier = getAttrByName(characterID, modifierName)
-                				    result += getRoll(cmds[2], modifier)
-                            })
-                            sendChat('DM', result)
+							if (cmds[1] == 'attack'){
+								result += 'Mass Attack'
+								_.chain(msg.selected)
+									.map(function(o){return getObj('graphic',o._id)})
+									.compact()
+									.each(function(obj){
+										obj.set('status_yellow', count++)
+										var characterID = obj.get('represents')
+										result += '\n' + getD20Roll(cmds[2], getAttrByName(characterID, 'attackHitMod'))
+										result += ' for [[' + getAttrByName(characterID, 'attackDamageRoll') + ']] '
+										result += getAttrByName(characterID, 'attackDamageType')
+								})
+								sendChat('DM', result)
+							} else {
+								result += cmds[1]+' rolls: '
+								var modifierName = cmds[1]+'Mod'
+								_.chain(msg.selected)
+									.map(function(o){return getObj('graphic',o._id)})
+									.compact()
+									.each(function(obj){
+										obj.set('status_yellow', count++)
+										var characterID = obj.get('represents')
+										var modifier = getAttrByName(characterID, modifierName)
+										result += getD20Roll(cmds[2], modifier)
+								})
+								sendChat('DM', result)
+							}
                             break
                         case 'clearmarkers':
                             _.chain(msg.selected)
